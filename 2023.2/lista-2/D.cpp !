@@ -1,0 +1,83 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+using ii = pair<int, int>; 
+map<char, int> translate = {
+    {'a', 1}, 
+    {'b', 2}, 
+    {'c', 3}, 
+    {'d', 4}, 
+    {'e', 5},
+    {'f', 6},
+    {'g', 7},
+    {'h', 8}
+}; 
+vector<ii> directions = {{-1, 1}, {1, -1}, {1, 1}, {-1, -1}, {0, 1}, {1, 0}, {0, -1}, {-1, 0}}; 
+ii new_t, new_s; 
+vector<string> response; 
+queue<ii> q;
+map<ii, ii> father;
+
+vector<ii> verifica_arestas(ii par){
+    vector<ii> valid;
+    for(auto i: directions){
+        ii n = ii(par.first + i.first, par.second + i.second);
+        if(n.first <= 8 and n.first >= 1 and n.second <= 8 and n.second >=1){
+            valid.emplace_back(n);
+        }   
+    }
+ 
+    return valid;
+}
+void find_result(ii t){
+	while(t!=new_s){
+	    ii direction = ii(t.first - father[t].first, t.second - father[t].second); 
+	    if(direction == directions[0])
+	    	response.push_back("LU");
+	    else if(direction == directions[1])
+		response.push_back("RD"); 
+	    else if(direction == directions[2])
+		response.push_back("RU");
+	    else if(direction == directions[3])
+	        response.push_back("LD"); 
+	    else if(direction == directions[4])
+	        response.push_back("U");
+	    else if(direction == directions[5])
+	        response.push_back("R");
+            else if(direction == directions[6])
+	        response.push_back("D");
+            else
+   		response.push_back("L");
+	    t = father[t];
+	}
+}
+void bfs(ii s){
+    q.push(s); 
+    father[s] = s;
+    while(!q.empty()){
+        s = q.front();
+	q.pop();  
+	vector<ii> valid_arestas = verifica_arestas(s); 
+        for(ii i: valid_arestas){
+		if(father.find(i) == father.end()){
+            		father[i] = s; 
+            		q.push(i);
+	    }	
+        }
+    }
+}
+
+int main()
+{
+    string s, t; 
+    cin >> s >> t; 
+    new_s = ii(translate[s[0]],s[1] - '0'); 
+    new_t = ii(translate[t[0]],t[1] - '0'); 
+    bfs(new_s);
+    find_result(new_t);  
+    cout << response.size() << endl;
+    for(int i=response.size()-1; i>=0;i--)
+	cout << response[i] << endl; 
+	
+    return 0;
+}
